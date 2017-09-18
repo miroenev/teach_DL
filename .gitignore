@@ -1,2 +1,5 @@
 *checkpoint*
 *.pyc
+experiments/
+todo.txt
+*.hdf5
