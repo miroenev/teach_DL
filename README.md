@@ -3,7 +3,7 @@
 Lets try to predict commute duration from two observable independent variables: the time of day and the weather conditions.
 
 <img src='https://github.com/miroenev/teach_DL/blob/master/figures/commute.svg' width='400'/>
-<img src='figures/target_distribution.png' width='1000'/>
+<img src='https://github.com/miroenev/teach_DL/blob/master/figures/target_distribution.PNG' width='1000'/>
 In this toy example we'll first take on the role of the 'traffic gods' and decree that commute duration is defined through a linear mixture of the two independent variables. Later we'll sample from the distribution defined by these variables and generate a training dataset. This sampling procedure will be analogous to keeping a journal of all of our commutes for some [ long ] period of time, where each log entry consists of a set of  
 * <b>X</b>: [ time-of-departure, weather-condition ], and the associated  
 * <b>Y</b>: [ commute-duration ].
