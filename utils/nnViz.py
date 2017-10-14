@@ -35,6 +35,7 @@ class Layer():
         self.neurons = self.__intialise_neurons(number_of_neurons)
         self.weights = weights
         self.maxWeight = 15
+        self.minWeight = 1
 
 
     def __intialise_neurons(self, number_of_neurons):
@@ -65,7 +66,7 @@ class Layer():
         else:
             return None
 
-    def __line_between_two_neurons(self, neuron1, neuron2, linewidth):
+    def __line_between_two_neurons(self, neuron1, neuron2, linewidth, sign):
         global neuron_radius
         angle = atan((neuron2.x - neuron1.x) / float(neuron2.y - neuron1.y))
         x_adjustment = neuron_radius * sin(angle)
@@ -73,7 +74,7 @@ class Layer():
         line_x_data = (neuron1.x - x_adjustment, neuron2.x + x_adjustment)
         line_y_data = (neuron1.y - y_adjustment, neuron2.y + y_adjustment)
 
-        if linewidth > 0:
+        if sign > 0:
             #lineColor = (0,0,.5)
             #lineColor = amazonSquidInk
             lineColor = nikeGreen
@@ -95,11 +96,20 @@ class Layer():
                     previous_layer_neuron = self.previous_layer.neurons[previous_layer_neuron_index]
 
                     if self.previous_layer.weights is not None:
-                        weight = np.min( (self.maxWeight, self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) ) 
+                        rawWeight = self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]
+                        if rawWeight > 0:
+                            sign = 1
+                        else:
+                            sign = -1
+                        processedWeight = abs(self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) * 5 + .5
+                        weight = min ( (self.maxWeight , max( self.minWeight,  processedWeight)) )
+                        print ( str(weight) + ', ' + str( rawWeight ))
+                        #weight = np.min( (self.maxWeight, self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) ) 
                     else:
-                        weight = 1
-                    self.__line_between_two_neurons(neuron, previous_layer_neuron, weight)
+                        weight = self.minWeight
+                    self.__line_between_two_neurons(neuron, previous_layer_neuron, weight, sign)
             neuron.draw()
+
 
 
 class NeuralNetwork():
