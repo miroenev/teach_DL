@@ -8,8 +8,8 @@ import numpy as np
 from customcolors import * 
 
 vertical_distance_between_layers = 5.5
-horizontal_distance_between_neurons = 2.5
-neuron_radius = 0.5
+horizontal_distance_between_neurons = 2
+neuron_radius = 0.75
 number_of_neurons_in_widest_layer = 4 
 
 class Neuron():
@@ -34,8 +34,9 @@ class Layer():
         self.y = self.__calculate_layer_y_position()
         self.neurons = self.__intialise_neurons(number_of_neurons)
         self.weights = weights
-        self.maxWeight = 15
-        self.minWeight = 1
+        self.maxWeight = 5
+        self.minWeight = .1
+
 
 
     def __intialise_neurons(self, number_of_neurons):
@@ -101,9 +102,12 @@ class Layer():
                             sign = 1
                         else:
                             sign = -1
-                        processedWeight = abs(self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) * 5 + .5
+
+                        processedWeight = abs(self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) # * 2 #+ .1
+                        
                         weight = min ( (self.maxWeight , max( self.minWeight,  processedWeight)) )
-                        print ( str(weight) + ', ' + str( rawWeight ))
+                        
+                        #print ( str(weight) + ', ' + str( rawWeight ))
                         #weight = np.min( (self.maxWeight, self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) ) 
                     else:
                         weight = self.minWeight

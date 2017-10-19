@@ -5,9 +5,9 @@ amazonOrange2 = (1, 153/255., 0, .25)
 amazonSquidInk = (35/255., 47/255., 62/255., 1); 
 amazonSquidInk2 = (35/255., 47/255., 62/255., 1.)
 
-nikeGreen = (75/255., 173/255., 49/255., .9)
+nikeGreen = (75/255., 173/255., 49/255., .75)
 nikeGreen2 = (75/255., 173/255., 49/255., .25)
-nikeBlack = (0, 0, 0, .8)
+nikeBlack = (0, 0, 0, .7)
 nikeBlack2 = (0, 0, 0, .5)
 nikeBlack3 = (0, 0, 0, .25)
 
