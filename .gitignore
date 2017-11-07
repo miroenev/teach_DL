@@ -1,6 +1,7 @@
 *checkpoint*
 *.pyc
 experiments/
+fig_gen/
 videos/
 todo.txt
 *.hdf5
