@@ -1,0 +1,5 @@
+possible extensions:
+1 -- multi-sensor
+2 -- distributed
+
+3 -- deployment optimization (quantization & pruning per sensor stream or group )
