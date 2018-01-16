@@ -1,0 +1,103 @@
+# set up software tools on AMI -- e.g., starting with CUDA 9 DL AMI
+apt-get update
+
+# initially no installed version of keras, so install it
+pip install keras==2.0.8 --user
+
+# ensure tensorflow backend
+vi ~/.keras/keras.json
+
+	{
+    	"epsilon": 1e-07,
+    	"floatx": "float32",
+    	"image_data_format": "channels_last",
+    	"backend": "tensorflow"
+	}
+
+# install horovod
+pip install horovod --user
+
+# clone latest horovod repo with examples
+git clone http://github.com/uber/horovod
+
+
+# copy private key (i.e. private_key.pem) to /home/ubuntu/.ssh
+# so each workers machine can ssh to all others
+
+# set private key permissions
+chmod 600 private_key.pem
+
+# modify ssh_config so the default ssh connection setting points to the private key
+sudo vi /etc/ssh/.ssh_config
+
+	IdentityFile ~/home/ubuntu/.ssh/private_key.pem
+
+	StrictHostKeyChecking no
+
+
+
+
+# create hostfile each line has IP followed by slots=#GPUs,
+ubuntu@ip-172-31-35-88:~$ cat hostfile
+	localhost slots=8
+	172.31.41.13 slots=8
+
+
+# save/create AMI for spinning up multiple workers using AWS gui
+
+# launch multiple instances [ using EMR/CloudFormation ]
+
+# create security group [ assign AMIs to security group ]
+# need to enable TCP port opening between hosts
+
+# ping and ssh to verify between hosts
+
+# launch mpirun 
+# on other instances run 'watch nvidia-smi'
+
+
+# single node example with a single GPU
+
+mpirun -np 8 \
+    -v -bind-to none -oversubscribe \
+    -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH \
+    python ~/horovod/examples/keras_mnist.py
+
+# same command but time the execution duration
+
+/usr/bin/time -v mpirun -np 16 \
+    -v -bind-to none -oversubscribe \
+    -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH \
+    python ~/horovod/examples/keras_mnist.py
+
+	# duration 1m58.528s
+
+# single node example with 8 GPUs
+
+/usr/bin/time -v mpirun -np 8 \
+    -v -bind-to none -oversubscribe \
+    -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH \
+    python ~/horovod/examples/keras_mnist.py
+
+	# duration 0m39.842s
+
+
+# multi-node 
+
+/usr/bin/time -v mpirun -np 16 \
+    -v -bind-to none -oversubscribe \
+    -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH \
+    -hostfile hostfile \
+    python ~/horovod/examples/keras_mnist.py
+
+	# duration 28 seconds
+
+
+# example of long running process
+/usr/bin/time -v mpirun -np 16 \
+    -v -bind-to none -oversubscribe \
+    -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH \
+    -hostfile hostfile \
+    python ~/horovod/examples/tensorflow_word2vec.py
+
+	

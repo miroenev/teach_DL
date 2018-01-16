@@ -9,7 +9,7 @@ import matplotlib.pylab as _2DBackend
 ''' ------------
     DEFAULTS
 ------------ ''' 
-globalTimestepLimit = 3
+globalTimestepLimit = 7
 
 timeStepsToOmit = [] # range(2,8)
 
