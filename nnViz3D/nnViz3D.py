@@ -9,7 +9,7 @@ import matplotlib.pylab as _2DBackend
 ''' ------------
     DEFAULTS
 ------------ ''' 
-globalTimestepLimit = 7
+globalTimestepLimit = 5
 
 timeStepsToOmit = [] # range(2,8)
 
@@ -17,28 +17,46 @@ timeStepsToOmit = [] # range(2,8)
 defaultInputStructure = { 'data': np.random.randint(0, 10, size=(100,1))/10.,
                             'dataIter': [],
                             'activeInputPositions': np.array([0, 0, 0], dtype='f') }
-LSTM_flag = False
+LSTM_flag = True
 recurrentNeuronLimit = np.Inf
 
 if LSTM_flag:
-    recurrentLayers = [3]
-    defaultArchStructure = { 'neuronsInLayers': [10, 5, 5, 5, 5, 1],
-                                   'weights': [ np.random.randint(0, 10, size=(10, 5))/10. - .5,
-                                                np.random.randint(0, 10, size=(5, 5))/10. - .5,
-                                                np.random.randint(0, 10, size=(5, 5))/10. - .5,
-                                                np.random.randint(0, 10, size=(5, 5))/10. - .5,
-                                                np.random.randint(0, 10, size=(5, 1))/10. - .5 ],
+    recurrentLayers = [ 0, 1, 2 ]
+    defaultArchStructure = { 'neuronsInLayers': [ 10, 10, 10, 1],
+                                   'weights': [ np.random.randint(0, 10, size=(10, 10))/10. - .5,
+                                                np.random.randint(0, 10, size=(10, 10))/10. - .5,
+                                                np.random.randint(0, 10, size=(10, 1))/10. - .5 ],                                          
                                    'neuronPositions': {}}
 else:
+    '''
+    # ARIMA like
+    recurrentLayers = [] # [1]
+    defaultArchStructure = { 'neuronsInLayers': [10, 1],
+                            'weights': [ np.random.randint(0, 10, size=(10, 1))/10. - .5],
+                            'neuronPositions': {}}
+    '''
+    '''
+    # dense + no recurrence
+    recurrentLayers = [] # [1]
+    defaultArchStructure = { 'neuronsInLayers': [10, 10, 10, 1],
+                                   'weights': [ np.random.randint(0, 10, size=(10, 10))/10. - .5,
+                                                np.random.randint(0, 10, size=(10, 10))/10. - .5,
+                                                np.random.randint(0, 10, size=(10, 1))/10. - .5 ],                                          
+                            'neuronPositions': {}}
+    
+    '''
+
+    
     recurrentLayers = [1] # [1]
     defaultArchStructure = { 'neuronsInLayers': [10, 5, 1],
                             'weights': [ np.random.randint(0, 10, size=(10, 5))/10. - .5,
                                         np.random.randint(0, 10, size=(5, 1))/10. - .5 ],
                             'neuronPositions': {}}
+    
 
 
 defaultTimeStructure = { 'timeIndex' : 0, 
-                           'inputSamplesPerTimestep': 10 }
+                           'inputSamplesPerTimestep': 5 }
 
 
 defaultPlottingParams = { '3D.Flag': True,
@@ -85,7 +103,7 @@ class NNViz3D():
         self.plottingParams = plottingParams
 
         nTimesteps = int( len( inputStructure['data'] ) / timeStructure['inputSamplesPerTimestep'] )
-        
+
         ''' initialize 2D or 3D display '''
         _3D_Plot = plottingParams['3D.Flag']
         
@@ -170,10 +188,13 @@ class NNViz3D():
                                           nextPointPosition[0], nextPointPosition[1], nextPointPosition[2] ), 
                                           color = self.plottingParams['inputLineColor'], width = .25 )
 
-            if iSample > activeRangeStart and iSample <= activeRangeEnd:
+            if iSample >= activeRangeStart and iSample < activeRangeEnd:
                 
                 if self.inputStructure['activeInputPositions'] == []:
-                    self.inputStructure['activeInputPositions'] = pointPosition
+                    #self.inputStructure['activeInputPositions'] = pointPosition
+                    self.inputStructure['activeInputPositions'] = np.expand_dims(pointPosition, axis = 0)
+                    
+                    
                 else:
                     self.inputStructure['activeInputPositions'] = \
                         np.vstack( ( self.inputStructure['activeInputPositions'], 
@@ -236,6 +257,10 @@ class NNViz3D():
     def connect_input_to_network ( self ):
         nInputNeurons = len( self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][0] )
         nActiveInputs = self.inputStructure['activeInputPositions'].shape[0]
+        if len ( self.inputStructure['activeInputPositions'].shape ) == 1:
+            print ('one neuron')
+
+
         for iActiveInput in range ( nActiveInputs ):
             for iInputNeuron in range ( nInputNeurons ):
                 neuronPos = self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][0][iInputNeuron]
@@ -278,19 +303,22 @@ class NNViz3D():
                 nOriginNeurons = len( self.archStructure['neuronPositions'][self.timeStructure['timeIndex']-1][iLayer] )
                 
                 for iOriginNeuron in range ( nOriginNeurons ):
-                    
+                    '''
                     if LSTM_flag:
                         nDestinationNeurons = len( self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer - 1] ) # LSTM change to account for prev state gate                  
                     else:
                         nDestinationNeurons = len( self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer] )
-                    
+                    '''
+                    nDestinationNeurons = len( self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer] )
                     for iDestinationNeuron in range ( min( recurrentNeuronLimit, nDestinationNeurons) ):
                         originNeuronPosition = self.archStructure['neuronPositions'][self.timeStructure['timeIndex']-1][iLayer][iOriginNeuron]
+                        '''
                         if LSTM_flag:
                             destinationNeuronPosition = self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer-1][iDestinationNeuron] # LSTM change                        
                         else:
                             destinationNeuronPosition = self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer][iDestinationNeuron]
-                        
+                        '''
+                        destinationNeuronPosition = self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer][iDestinationNeuron]
 
                         self.canvas += self.backend.line( ( originNeuronPosition[0], originNeuronPosition[1], originNeuronPosition[2],
                                                               destinationNeuronPosition[0], destinationNeuronPosition[1], destinationNeuronPosition[2] ), width = 1, color = self.plottingParams['recurrentWeightColor'] )
