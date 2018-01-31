@@ -1,3 +1,57 @@
+'''
+    TODO: network rolling through time? 
+                visual = 3 sequential steps in cell figure + full screen zoomable 
+            keyboard input interface ? [ plot next timestep ] @ current graph ( as input )
+            
+            
+    TODO: single & multi signal/dim ( @ 3 signals )
+            ? single vs multi sample input
+            TODO: single and multi sample output
+
+    TODO: learning method:            
+        TODO: MLP
+            pro -- arbitrary good at function approximation
+            caveat -- compute/memory limits history
+
+    Q?!: how can we fit both a large model and a large history in our compute
+
+        TODO: one solution [ rnn ]
+            stream through the data carrying state
+        TODO: backpropagation through time [ unrolled steps ]            
+            multi-slide example [ weight selection ]
+
+            caveats -- weight matrix the same [ i.e. ]
+
+
+            caveat -- dampen or amplify [ present / past ]
+            caveat -- short retention [ memento ]
+            caveat -- initialization 
+            
+
+            + image
+
+        TODO: FYI backpropagation [ via wave/dilution networks ]
+
+        TODO: augmentations = LSTMs
+            being picky about what to remember 
+
+        
+    TODO: gate implementation [ what do we let onto our paper [ multi sheet ] ]
+            [ custom layers rel to current plot origin ]
+            + [ custom connection structure to input - input position needed ]
+
+    TODO: caveats: cold start
+    TODO: caveats: BPTT [ compute forward state ] -- only update gradients on last N% timesteps
+    
+
+    TODO: CNNs, bias weights, normalization ? 
+
+    TODO: context decomposition [ NLP visualization ]
+    TODO: seizure detection 
+
+'''
+
+
 ''' X = time axis '''
 ''' Y = model width axis '''
 ''' Z = model height axis '''
@@ -9,24 +63,37 @@ import matplotlib.pylab as _2DBackend
 ''' ------------
     DEFAULTS
 ------------ ''' 
-globalTimestepLimit = 5
+globalTimestepLimit = 2
+nInputDimensions = 3
+LSTM_flag = True
+
 
 timeStepsToOmit = [] # range(2,8)
-
-
-defaultInputStructure = { 'data': np.random.randint(0, 10, size=(100,1))/10.,
-                            'dataIter': [],
-                            'activeInputPositions': np.array([0, 0, 0], dtype='f') }
-LSTM_flag = True
 recurrentNeuronLimit = np.Inf
 
+defaultTimeStructure = { 'timeIndex' : 0, 
+                           'inputSamplesPerTimestep': 1 }
+
+defaultInputStructure = { 'data': np.random.randint(0, 10, size = (20, nInputDimensions))/10.,
+                            'dataIter': [],
+                            'activeInputPositions': np.array([0, 0, 0], dtype='f') }
+
 if LSTM_flag:
-    recurrentLayers = [ 0, 1, 2 ]
-    defaultArchStructure = { 'neuronsInLayers': [ 10, 10, 10, 1],
-                                   'weights': [ np.random.randint(0, 10, size=(10, 10))/10. - .5,
-                                                np.random.randint(0, 10, size=(10, 10))/10. - .5,
-                                                np.random.randint(0, 10, size=(10, 1))/10. - .5 ],                                          
-                                   'neuronPositions': {}}
+    # recurrentLayers == lstmLayers .: gated
+    defaultArchStructure = { 'recurrentLayers':  [ 0, 1, 2 ] ,
+                                'neuronsInLayers': [ 10, 10, 10, 1],
+                                'weights': [ np.random.randint(0, 10, size=(10, 10))/10. - .5,
+                                            np.random.randint(0, 10, size=(10, 10))/10. - .5,
+                                            np.random.randint(0, 10, size=(10, 1))/10. - .5 ],                                          
+                                'neuronPositions': {}}
+
+    
+    defaultArchStructure = { 'recurrentLayers': [ 0 ],
+                                'neuronsInLayers': [ 10, 1 ],
+                                'weights': [ np.random.randint(0, 10, size=(10, 1))/10. - .5 ],                                          
+                                'neuronPositions': {},
+                                }
+
 else:
     '''
     # ARIMA like
@@ -45,19 +112,13 @@ else:
                             'neuronPositions': {}}
     
     '''
-
     
-    recurrentLayers = [1] # [1]
+    recurrentLayers = [0, 1] # [1]
     defaultArchStructure = { 'neuronsInLayers': [10, 5, 1],
                             'weights': [ np.random.randint(0, 10, size=(10, 5))/10. - .5,
                                         np.random.randint(0, 10, size=(5, 1))/10. - .5 ],
                             'neuronPositions': {}}
     
-
-
-defaultTimeStructure = { 'timeIndex' : 0, 
-                           'inputSamplesPerTimestep': 5 }
-
 
 defaultPlottingParams = { '3D.Flag': True,
                              '3D.Shader': 'mesh', 
@@ -66,20 +127,20 @@ defaultPlottingParams = { '3D.Flag': True,
                              'offset': np.array( [-20, 0, 6], dtype='f' ),
                          
                              'inputSampleSpacing': np.array( [0, .15, 0 ], dtype='f' ),
-                             'timeSpacing': np.array( [8, 0, 0], dtype='f' ),
-                         
+                             'inputMultiDimensionalSpacing': np.array( [1, 0, 0 ], dtype='f' ),
+                             'timeSpacing': np.array( [10, 0, 0], dtype='f' ),
+
                              'inputMarkerColor': 0x000000,
                              'inputActiveMarkerColor': 0x00FF00,
                              'inputLineColor': 0x999999,
                              'inputConnectionLineColor': 0xCCCCDD,
                              'positiveWeightColor': 0x9EFF96,
                              'negativeWeightColor': 0xCCAC91,
-                             'recurrentWeightColor': 0x003366,
-                         
+                             'recurrentWeightColor': 0x112233,                         
                          
                              'neuronSize': 1,
                              'neuronColor': 0x9D6EFF,
-                             'layerVerticalOffset': np.array([0, 0, 3], dtype='f'),
+                             'layerVerticalOffset': np.array([0, 0, 4], dtype='f'),
                              'interNeuronHorizontalSpacing': 1,
                              'minWeightLineThickness': .1,
                              'maxWeightLineThickness': 3,
@@ -172,46 +233,49 @@ class NNViz3D():
         horizontalOffset = - self.plottingParams['inputSampleSpacing'] * int(nSamples/2.)   
         verticalOffset = - np.array( [ 0, 0, 5 ] ) # 2 Z units below current location
         
-        offsetChain = self.plottingParams['offset'] + horizontalOffset + verticalOffset   
+           
         
         activeRangeStart = self.timeStructure['timeIndex'] * self.timeStructure['inputSamplesPerTimestep']
         activeRangeEnd = activeRangeStart + self.timeStructure['inputSamplesPerTimestep']
         
         self.inputStructure['activeInputPositions'] = []
-
-        for iSample in range ( nSamples-1 ):
-            pointPosition = offsetChain + np.array( [0, 0, self.inputStructure['data'][iSample] ] )
-            nextPointPosition = offsetChain + self.plottingParams['inputSampleSpacing'] \
-                                    + np.array( [0, 0, self.inputStructure['data'][iSample + 1] ] )
+        for iInputDimension in range ( nInputDimensions ):
             
-            self.canvas += self.backend.line ( ( pointPosition[0], pointPosition[1], pointPosition[2],
-                                          nextPointPosition[0], nextPointPosition[1], nextPointPosition[2] ), 
-                                          color = self.plottingParams['inputLineColor'], width = .25 )
+            offsetChain = self.plottingParams['offset'] + self.plottingParams['inputMultiDimensionalSpacing'] * iInputDimension + verticalOffset
 
-            if iSample >= activeRangeStart and iSample < activeRangeEnd:
+            for iSample in range ( nSamples-1 ):
+                pointPosition = offsetChain + np.array( [0, 0, self.inputStructure['data'][iSample, iInputDimension] ] )
+                nextPointPosition = offsetChain + self.plottingParams['inputSampleSpacing'] \
+                                        + np.array( [0, 0, self.inputStructure['data'][iSample + 1, iInputDimension] ] )
                 
-                if self.inputStructure['activeInputPositions'] == []:
-                    #self.inputStructure['activeInputPositions'] = pointPosition
-                    self.inputStructure['activeInputPositions'] = np.expand_dims(pointPosition, axis = 0)
+                self.canvas += self.backend.line ( ( pointPosition[0], pointPosition[1], pointPosition[2],
+                                            nextPointPosition[0], nextPointPosition[1], nextPointPosition[2] ), 
+                                            color = self.plottingParams['inputLineColor'], width = .25 )
+
+                if iSample >= activeRangeStart and iSample < activeRangeEnd:
                     
+                    if self.inputStructure['activeInputPositions'] == []:
+                        #self.inputStructure['activeInputPositions'] = pointPosition
+                        self.inputStructure['activeInputPositions'] = np.expand_dims(pointPosition, axis = 0)
+                        
+                        
+                    else:
+                        self.inputStructure['activeInputPositions'] = \
+                            np.vstack( ( self.inputStructure['activeInputPositions'], 
+                                        pointPosition ) )
+                    
+                    self.canvas += self.backend.points( positions = pointPosition, 
+                                                color = self.plottingParams['inputActiveMarkerColor'], 
+                                                point_size = .2, shader = self.plottingParams['3D.Shader'] )
                     
                 else:
-                    self.inputStructure['activeInputPositions'] = \
-                        np.vstack( ( self.inputStructure['activeInputPositions'], 
-                                     pointPosition ) )
-                
-                self.canvas += self.backend.points( positions = pointPosition, 
-                                             color = self.plottingParams['inputActiveMarkerColor'], 
-                                             point_size = .2, shader = self.plottingParams['3D.Shader'] )
-                
-            else:
-                self.canvas += self.backend.points( positions = pointPosition, 
-                                             color = self.plottingParams['inputMarkerColor'], 
-                                             point_size = .1, shader = self.plottingParams['3D.Shader'] )
+                    self.canvas += self.backend.points( positions = pointPosition, 
+                                                color = self.plottingParams['inputMarkerColor'], 
+                                                point_size = .1, shader = self.plottingParams['3D.Shader'] )
 
-            offsetChain += self.plottingParams['inputSampleSpacing']
-            
-            pass # end of per sample for loop
+                offsetChain += self.plottingParams['inputSampleSpacing']
+                
+                pass # end of per sample for loop
         pass # end of draw_input
 
 
@@ -223,6 +287,10 @@ class NNViz3D():
         self.archStructure['neuronPositions'][self.timeStructure['timeIndex']] = {}
         
         for iLayer in range( nLayers ):
+
+            if iLayer in self.archStructure['recurrentLayers']:
+                print('need gates sire')
+             
             self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer] = {}
             
             layerHorizontalOffset = - np.array( [ 0, int( self.archStructure['neuronsInLayers'][iLayer]/2. ) 
@@ -298,7 +366,7 @@ class NNViz3D():
         nLayers = len ( self.archStructure['neuronsInLayers'] )
         
         for iLayer in range( nLayers - 1 ):
-            if iLayer in recurrentLayers:
+            if iLayer in self.archStructure['recurrentLayers']:
                 
                 nOriginNeurons = len( self.archStructure['neuronPositions'][self.timeStructure['timeIndex']-1][iLayer] )
                 
