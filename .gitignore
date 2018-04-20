@@ -5,3 +5,4 @@ fig_gen/
 videos/
 todo.txt
 *.hdf5
+*.gz

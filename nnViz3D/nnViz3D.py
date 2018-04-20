@@ -1,3 +1,18 @@
+# mlp vs rnn explained # viz demo(s)
+# rnn applications [ 1:1, 1:many, many:many]
+# rnn v2 explained [ vanishing gradient ] # viz demo(s)
+    # gates [ i.e. learned control of memory ]
+
+# learning demo [ 1 neuron retention ]
+# time series forecasting
+
+# bi-directional
+# attentional mechanisms
+# interpretation
+
+
+# https://www.coursera.org/learn/nlp-sequence-models/lecture/ehs0S/deep-rnns
+# m@cs c0urs3r4
 '''
     TODO: network rolling through time? 
                 visual = 3 sequential steps in cell figure + full screen zoomable 
@@ -63,9 +78,9 @@ import matplotlib.pylab as _2DBackend
 ''' ------------
     DEFAULTS
 ------------ ''' 
-globalTimestepLimit = 2
-nInputDimensions = 3
-LSTM_flag = True
+globalTimestepLimit = 4
+nInputDimensions = 1
+LSTM_flag = False
 
 
 timeStepsToOmit = [] # range(2,8)
@@ -74,7 +89,7 @@ recurrentNeuronLimit = np.Inf
 defaultTimeStructure = { 'timeIndex' : 0, 
                            'inputSamplesPerTimestep': 1 }
 
-defaultInputStructure = { 'data': np.random.randint(0, 10, size = (20, nInputDimensions))/10.,
+defaultInputStructure = { 'data': np.random.randint(0, 10, size = (100, nInputDimensions))/10.,
                             'dataIter': [],
                             'activeInputPositions': np.array([0, 0, 0], dtype='f') }
 
@@ -86,13 +101,6 @@ if LSTM_flag:
                                             np.random.randint(0, 10, size=(10, 10))/10. - .5,
                                             np.random.randint(0, 10, size=(10, 1))/10. - .5 ],                                          
                                 'neuronPositions': {}}
-
-    
-    defaultArchStructure = { 'recurrentLayers': [ 0 ],
-                                'neuronsInLayers': [ 10, 1 ],
-                                'weights': [ np.random.randint(0, 10, size=(10, 1))/10. - .5 ],                                          
-                                'neuronPositions': {},
-                                }
 
 else:
     '''
@@ -113,8 +121,9 @@ else:
     
     '''
     
-    recurrentLayers = [0, 1] # [1]
-    defaultArchStructure = { 'neuronsInLayers': [10, 5, 1],
+    
+    defaultArchStructure = { 'recurrentLayers': [0], # [1]
+                            'neuronsInLayers': [10, 5, 1],
                             'weights': [ np.random.randint(0, 10, size=(10, 5))/10. - .5,
                                         np.random.randint(0, 10, size=(5, 1))/10. - .5 ],
                             'neuronPositions': {}}
