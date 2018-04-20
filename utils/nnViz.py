@@ -76,13 +76,13 @@ class Layer():
         line_y_data = (neuron1.y - y_adjustment, neuron2.y + y_adjustment)
 
         if sign > 0:
-            #lineColor = (0,0,.5)
+            lineColor = (0,0,.5)
             #lineColor = amazonSquidInk
-            lineColor = nikeGreen
+            #lineColor = nikeGreen
         else:
-            #lineColor = (.5,0,0)
+            lineColor = (.5,0,0)
             #lineColor = amazonOrange
-            lineColor = nikeBlack
+            #lineColor = nikeBlack
 
         line = pyplot.Line2D(line_x_data, line_y_data, linewidth=linewidth, color=lineColor)
         line.set_zorder(1)
@@ -107,8 +107,7 @@ class Layer():
                         
                         weight = min ( (self.maxWeight , max( self.minWeight,  processedWeight)) )
                         
-                        #print ( str(weight) + ', ' + str( rawWeight ))
-                        #weight = np.min( (self.maxWeight, self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) ) 
+                        #print ( str(weight) + ', ' + str( rawWeight ))                        
                     else:
                         weight = self.minWeight
                     self.__line_between_two_neurons(neuron, previous_layer_neuron, weight, sign)
