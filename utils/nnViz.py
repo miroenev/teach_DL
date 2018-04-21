@@ -5,12 +5,11 @@
 from matplotlib import pyplot
 from math import cos, sin, atan
 import numpy as np
-from customcolors import * 
 
-vertical_distance_between_layers = 5.5
-horizontal_distance_between_neurons = 2
-neuron_radius = 0.75
-number_of_neurons_in_widest_layer = 4 
+verticalDistanceBetweenLayers = 5.5
+horizontalDistanceBetweenNeurons = 2
+neuronRadius = 0.75
+nNeuronsInWidestLayer = 4 
 
 class Neuron():
     def __init__(self, x, y):
@@ -18,99 +17,91 @@ class Neuron():
         self.y = y      
 
     def draw(self):
-        global neuron_radius
-        circle = pyplot.Circle((self.x, self.y), radius=neuron_radius, fill=True)
+        global neuronRadius
+        circle = pyplot.Circle((self.x, self.y), radius=neuronRadius, fill=True)
         circle.set_edgecolor((0,0,0))
         circle.set_facecolor((1,1,1))
         circle.set_linewidth(2)
         circle.set_zorder(2)
         pyplot.gca().add_patch(circle)
 
-
-
 class Layer():
-    def __init__(self, network, number_of_neurons, weights):
-        self.previous_layer = self.__get_previous_layer(network)
-        self.y = self.__calculate_layer_y_position()
-        self.neurons = self.__intialise_neurons(number_of_neurons)
+    def __init__(self, network, nNeurons, weights):
+        self.prevLayer = self.get_prevLayer(network)
+        self.y = self.compute_layer_vertical_pos()
+        self.neurons = self.initialize_neurons(nNeurons)
         self.weights = weights
         self.maxWeight = 5
         self.minWeight = .1
 
-
-
-    def __intialise_neurons(self, number_of_neurons):
-        global horizontal_distance_between_neurons
+    def initialize_neurons(self, nNeurons):
+        global horizontalDistanceBetweenNeurons
         neurons = []
-        x = self.__calculate_left_margin_so_layer_is_centered(number_of_neurons)
-        for iteration in range(number_of_neurons):
+        x = self.compute_left_margin(nNeurons)
+        for iteration in range(nNeurons):
             neuron = Neuron(x, self.y)
             neurons.append(neuron)
-            x += horizontal_distance_between_neurons
+            x += horizontalDistanceBetweenNeurons
         return neurons
 
-    def __calculate_left_margin_so_layer_is_centered(self, number_of_neurons):
-        global horizontal_distance_between_neurons
-        global number_of_neurons_in_widest_layer
-        return horizontal_distance_between_neurons * (number_of_neurons_in_widest_layer - number_of_neurons) / 2
+    def compute_left_margin(self, nNeurons):
+        global horizontalDistanceBetweenNeurons
+        global nNeuronsInWidestLayer
+        return horizontalDistanceBetweenNeurons * (nNeuronsInWidestLayer - nNeurons) / 2
 
-    def __calculate_layer_y_position(self):
-        global vertical_distance_between_layers
-        if self.previous_layer:
-            return self.previous_layer.y + vertical_distance_between_layers
+    def compute_layer_vertical_pos(self):
+        global verticalDistanceBetweenLayers
+        if self.prevLayer:
+            return self.prevLayer.y + verticalDistanceBetweenLayers
         else:
             return 0
 
-    def __get_previous_layer(self, network):
+    def get_prevLayer(self, network):
         if len(network.layers) > 0:
             return network.layers[-1]
         else:
             return None
 
-    def __line_between_two_neurons(self, neuron1, neuron2, linewidth, sign):
-        global neuron_radius
+    def draw_edge(self, neuron1, neuron2, linewidth, sign):
+        global neuronRadius
         angle = atan((neuron2.x - neuron1.x) / float(neuron2.y - neuron1.y))
-        x_adjustment = neuron_radius * sin(angle)
-        y_adjustment = neuron_radius * cos(angle)
-        line_x_data = (neuron1.x - x_adjustment, neuron2.x + x_adjustment)
-        line_y_data = (neuron1.y - y_adjustment, neuron2.y + y_adjustment)
+        xOffset = neuronRadius * sin(angle)
+        yOffset = neuronRadius * cos(angle)
+        lineXTuple = (neuron1.x - xOffset, neuron2.x + xOffset)
+        lineYTuple = (neuron1.y - yOffset, neuron2.y + yOffset)
 
         if sign > 0:
-            lineColor = (0,0,.5)
-            #lineColor = amazonSquidInk
-            #lineColor = nikeGreen
+            lineColor = (0, 0, .5, .5) # positive weights in red, 50% transparency
         else:
-            lineColor = (.5,0,0)
-            #lineColor = amazonOrange
-            #lineColor = nikeBlack
+            lineColor = (.5, 0, 0, .5) # negative weights in blue, 50% transparency
 
-        line = pyplot.Line2D(line_x_data, line_y_data, linewidth=linewidth, color=lineColor)
+        line = pyplot.Line2D(lineXTuple, lineYTuple, linewidth=linewidth, color=lineColor)
         line.set_zorder(1)
         pyplot.gca().add_line(line)
 
     def draw(self):
-        for this_layer_neuron_index in range(len(self.neurons)):
-            neuron = self.neurons[this_layer_neuron_index]
+        for iNeuronCurrentLayer in range(len(self.neurons)):
+            neuron = self.neurons[iNeuronCurrentLayer]
 
-            if self.previous_layer:
-                for previous_layer_neuron_index in range(len(self.previous_layer.neurons)):
-                    previous_layer_neuron = self.previous_layer.neurons[previous_layer_neuron_index]
+            if self.prevLayer:
+                for iNeuronPreviousLayer in range(len(self.prevLayer.neurons)):
+                    prevLayer_neuron = self.prevLayer.neurons[iNeuronPreviousLayer]
 
-                    if self.previous_layer.weights is not None:
-                        rawWeight = self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]
+                    if self.prevLayer.weights is not None:
+                        rawWeight = self.prevLayer.weights[iNeuronCurrentLayer, iNeuronPreviousLayer]
                         if rawWeight > 0:
                             sign = 1
                         else:
                             sign = -1
 
-                        processedWeight = abs(self.previous_layer.weights[this_layer_neuron_index, previous_layer_neuron_index]) # * 2 #+ .1
+                        processedWeight = abs( self.prevLayer.weights[iNeuronCurrentLayer, iNeuronPreviousLayer])
                         
                         weight = min ( (self.maxWeight , max( self.minWeight,  processedWeight)) )
                         
-                        #print ( str(weight) + ', ' + str( rawWeight ))                        
+                        #print ( str(weight) + ', ' + str( rawWeight ))
                     else:
                         weight = self.minWeight
-                    self.__line_between_two_neurons(neuron, previous_layer_neuron, weight, sign)
+                    self.draw_edge(neuron, prevLayer_neuron, weight, sign)
             neuron.draw()
 
 
@@ -119,8 +110,8 @@ class NeuralNetwork():
     def __init__(self):
         self.layers = []
 
-    def add_layer(self, number_of_neurons, weights=None):
-        layer = Layer(self, number_of_neurons, weights)
+    def add_layer(self, nNeurons, weights=None):
+        layer = Layer(self, nNeurons, weights)
         self.layers.append(layer)
 
     def draw(self):        
@@ -131,22 +122,16 @@ class NeuralNetwork():
         pyplot.show()
 
 
-def visualize_model( model ):
-    import tensorflow as tf
+def visualize_model( model ):    
     nLayers = len(model.layers)
 
     modelWeightsTFVar = {}
     modelWeights = {}
     modelShape = {}
-    for iLayer in range( nLayers ):
-        modelShape[iLayer] = [ model.layers[iLayer].input_shape[1], model.layers[iLayer].output_shape[1] ]
-        modelWeightsTFVar[iLayer] = model.layers[iLayer].weights
 
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
-        for iLayer in range( nLayers ):
-            modelWeights[iLayer] = (modelWeightsTFVar[iLayer][0]).eval()
-            #modelWeights[iLayer][1] = (modelWeightsTFVar[iLayer][1]).eval()    
+    for iLayer in range( len( model.layers ) ):
+        modelShape[iLayer] = [ model.layers[iLayer].input_shape[1], model.layers[iLayer].output_shape[1] ]
+        modelWeights[iLayer] = model.layers[iLayer].get_weights()[0]
     
     network = NeuralNetwork()
     
