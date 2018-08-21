@@ -71,14 +71,14 @@
 ''' Y = model width axis '''
 ''' Z = model height axis '''
 
-from k3d import K3D as _3DBackend
+import k3d as _3DBackend
 import numpy as np
 import matplotlib.pylab as _2DBackend
 
 ''' ------------
     DEFAULTS
 ------------ ''' 
-globalTimestepLimit = 4
+globalTimestepLimit = 2
 nInputDimensions = 1
 LSTM_flag = False
 
@@ -103,13 +103,6 @@ if LSTM_flag:
                                 'neuronPositions': {}}
 
 else:
-    '''
-    # ARIMA like
-    recurrentLayers = [] # [1]
-    defaultArchStructure = { 'neuronsInLayers': [10, 1],
-                            'weights': [ np.random.randint(0, 10, size=(10, 1))/10. - .5],
-                            'neuronPositions': {}}
-    '''
     '''
     # dense + no recurrence
     recurrentLayers = [] # [1]
@@ -179,7 +172,7 @@ class NNViz3D():
         
         if _3D_Plot:
             self.backend = plottingParams['3D.Backend']
-            self.canvas = self.backend()
+            self.canvas = self.backend.plot()
         else:
             self.backend = plottingParams['2D.Backend']                
             self.canvas = figure()
@@ -259,7 +252,7 @@ class NNViz3D():
                 
                 self.canvas += self.backend.line ( ( pointPosition[0], pointPosition[1], pointPosition[2],
                                             nextPointPosition[0], nextPointPosition[1], nextPointPosition[2] ), 
-                                            color = self.plottingParams['inputLineColor'], width = .25 )
+                                            color = self.plottingParams['inputLineColor'], width = .05 )
 
                 if iSample >= activeRangeStart and iSample < activeRangeEnd:
                     
@@ -298,7 +291,7 @@ class NNViz3D():
         for iLayer in range( nLayers ):
 
             if iLayer in self.archStructure['recurrentLayers']:
-                print('need gates sire')
+                pass #print('need gates sire')
              
             self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer] = {}
             
@@ -344,7 +337,7 @@ class NNViz3D():
                 activeInputPos = self.inputStructure['activeInputPositions'][iActiveInput, :]
                 self.canvas += self.backend.line ( (activeInputPos[0], activeInputPos[1], activeInputPos[2],
                                                    neuronPos[0], neuronPos[1], neuronPos[2]), 
-                                                      color = self.plottingParams['inputConnectionLineColor'], width = .15 ) 
+                                                      color = self.plottingParams['inputConnectionLineColor'], width = .05 ) 
 
     def connect_layers_within_timestep ( self ):
         nLayers = len ( self.archStructure['neuronsInLayers'] )
@@ -362,12 +355,12 @@ class NNViz3D():
                     if connectingWeight > 0:
                         self.canvas += self.backend.line( ( originNeuronPosition[0], originNeuronPosition[1], originNeuronPosition[2],
                                                               destinationNeuronPosition[0], destinationNeuronPosition[1],
-                                                               destinationNeuronPosition[2] ), width = 1.5, 
+                                                               destinationNeuronPosition[2] ), width = .05, 
                                                                  color = self.plottingParams['positiveWeightColor'] )
                     else:
                         self.canvas += self.backend.line( ( originNeuronPosition[0], originNeuronPosition[1], originNeuronPosition[2],
                                                            destinationNeuronPosition[0], destinationNeuronPosition[1],
-                                                           destinationNeuronPosition[2] ), width = 1.5, 
+                                                           destinationNeuronPosition[2] ), width = .05, 
                                                          color = self.plottingParams['negativeWeightColor'] )
                         
     def connect_to_prev_timestep ( self ):
