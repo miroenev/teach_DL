@@ -391,7 +391,7 @@ class NNViz3D():
                         destinationNeuronPosition = self.archStructure['neuronPositions'][self.timeStructure['timeIndex']][iLayer][iDestinationNeuron]
 
                         self.canvas += self.backend.line( ( originNeuronPosition[0], originNeuronPosition[1], originNeuronPosition[2],
-                                                              destinationNeuronPosition[0], destinationNeuronPosition[1], destinationNeuronPosition[2] ), width = 1, color = self.plottingParams['recurrentWeightColor'] )
+                                                              destinationNeuronPosition[0], destinationNeuronPosition[1], destinationNeuronPosition[2] ), width = .05, color = self.plottingParams['recurrentWeightColor'] )
 
 
 class _3DBackend ():
