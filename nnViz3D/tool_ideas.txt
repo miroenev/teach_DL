@@ -1,0 +1,2 @@
+ipyvolume
+http://jupyter.org/widgets
