@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/pytorch:18.08-py3
+FROM nvcr.io/nvidia/mxnet:18.07-py3
 
 RUN apt-get update && apt-get install -qqy x11-apps \
 	python-numpy python-dev cmake \
@@ -10,7 +10,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
 #	python get-pip.py --force-reinstall
 
 RUN git clone https://github.com/openai/gym && cd gym && \
-	python3 setup.py clean && \
+	python3 ./setup.py clean && \
 	pip3 install -e '.[all]'
 
 RUN pip3 install keras-mxnet \
@@ -20,7 +20,7 @@ RUN pip3 install keras-mxnet \
 	ipydatawidgets \
 	k3d
 
-# ENV KERAS_BACKEND=mxnet
+ENV KERAS_BACKEND=mxnet
 
 RUN jupyter nbextension enable --py widgetsnbextension && \
 	jupyter nbextension install --py --sys-prefix k3d && \

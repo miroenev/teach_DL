@@ -1,0 +1,8 @@
+RL Paper Survey
+https://github.com/brylevkirill/notes/blob/master/Reinforcement%20Learning.md#interesting-papers---exploration-and-intrinsic-motivation
+
+Unity Curiosity in Sparse Rewards Blog
+https://blogs.unity3d.com/2018/06/26/solving-sparse-reward-tasks-with-curiosity/
+
+PPO [ and TRPO ] explained
+https://www.youtube.com/watch?v=gqX8J38tESw
