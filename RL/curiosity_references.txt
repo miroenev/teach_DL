@@ -6,3 +6,28 @@ https://blogs.unity3d.com/2018/06/26/solving-sparse-reward-tasks-with-curiosity/
 
 PPO [ and TRPO ] explained
 https://www.youtube.com/watch?v=gqX8J38tESw
+
+Deep Reinforcement Learning in Pytorch
+https://github.com/navneet-nmk/pytorch-rl
+
+	pytorch-rl implements some state-of-the art deep reinforcement learning algorithms in Pytorch, 
+	especially those concerned with continuous action spaces. 
+	You can train your algorithm efficiently either on CPU or GPU. 
+	Furthermore, pytorch-rl works with OpenAI Gym out of the box. 
+	This means that evaluating and playing around with different algorithms is easy. 
+
+
+https://github.com/navneet-nmk/pytorch-rl/search?q=curiosity&unscoped_q=curiosity
+https://github.com/navneet-nmk/pytorch-rl/blob/3814202a563ae19c71cf4b0ab8c9aa6126043baa/models/PPO.py
+
+    # Calculation of the curiosity reward
+    def calculate_intrinsic_reward(self, obs, action, new_obs):
+        # Encode the obs and new_obs
+        obs_encoding = self.invd_model.encode(obs)
+        new_obs_encoding = self.invd_model.encode(new_obs)
+
+        # Pass the action and obs encoding to forward dynamic model
+        pred_new_obs_encoding = self.fwd_model(obs_encoding, action)
+        reward = F.mse_loss(pred_new_obs_encoding, new_obs_encoding)
+
+        return reward
