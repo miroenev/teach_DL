@@ -17,7 +17,7 @@ sudo nvidia-docker run -ti --rm -e DISPLAY=$DISPLAY \
 	-v $HOME:/workspace \
 	-e XAUTHORITY=$XAUTH \
 	-p 8888:8888 \
-	pytorch-gym-x11-jupyter:v1 bash	
+	pytorch-tf-gym-x11-jupyter-baselines:v0 bash	
 #	gymp3x11jup:v0 /bin/bash
 #	pytorch-gym-x11-jupyter:v1 bash	
 # gym:py3 bash
