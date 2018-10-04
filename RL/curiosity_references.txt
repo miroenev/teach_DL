@@ -16,6 +16,9 @@ https://github.com/navneet-nmk/pytorch-rl
 	Furthermore, pytorch-rl works with OpenAI Gym out of the box. 
 	This means that evaluating and playing around with different algorithms is easy. 
 
+Policy Gradient methods and Proximal Policy Optimization (PPO): diving into Deep RL!
+https://www.youtube.com/watch?v=5P7I-xPq8u8
+
 
 https://github.com/navneet-nmk/pytorch-rl/search?q=curiosity&unscoped_q=curiosity
 https://github.com/navneet-nmk/pytorch-rl/blob/3814202a563ae19c71cf4b0ab8c9aa6126043baa/models/PPO.py
