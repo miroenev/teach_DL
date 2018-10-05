@@ -1,0 +1,25 @@
+RL -> 
+
+we are going to be talking about RL -- in the meantime your[*] agent will be learning!
+
+1 -- intro to RL
+2 -- PPO algo [ ? ]
+3 -- curiosity
+
+@ env building
+[
+	launch container magic
+	container [ 
+		pytorch
+	]
+	launch jupyter magic
+]
+
+pick your own game to train on
+
+[ plot @ interval ]
+video viz @ interval 
+....[  ].....[   ]......[   ].....
+
+
+... 
