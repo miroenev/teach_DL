@@ -1,0 +1,67 @@
+
+ssh [ with your username ] to psglogin.nvidia.com
+srun --comment=docker --pty bash -i
+
+[ should get a machine with GPUs ]
+
+git clone http://github.com/miroenev/teach_DL
+
+cd teach_DL
+cd RL
+docker build -t=pytorch-rl:v0 .
+
+./run-pytorch-rl.sh
+
+[ once inside container ]
+./launch_notebook.sh
+
+
+git clone https://github.com/openai/gym && \
+        cd gym && \
+        python3 setup.py clean && \
+        pip3 install --user -e '.[all]'
+
+
+
+I have no name!@a6e9bf963f58:/workspace/gym$ git clone https://github.com/openai/gym && \
+>         cd gym && \
+>         python3 setup.py clean && \
+>         pip3 install --user -e '.[all]'
+Cloning into 'gym'...
+remote: Enumerating objects: 8305, done.
+remote: Total 8305 (delta 0), reused 0 (delta 0), pack-reused 8305
+Receiving objects: 100% (8305/8305), 3.45 MiB | 1.37 MiB/s, done.
+Resolving deltas: 100% (5631/5631), done.
+Checking connectivity... done.
+Checking out files: 100% (210/210), done.
+running clean
+The directory '/.cache/pip/http' or its parent directory is not owned by the current user and the cache has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+The directory '/.cache/pip' or its parent directory is not owned by the current user and caching wheels has been disabled. check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+Obtaining file:///workspace/gym/gym
+Requirement already satisfied: scipy in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (1.1.0)
+Requirement already satisfied: numpy>=1.10.4 in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (1.15.0)
+Requirement already satisfied: requests>=2.0 in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (2.18.4)
+Requirement already satisfied: six in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (1.11.0)
+Requirement already satisfied: pyglet>=1.2.0 in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (1.3.2)
+Requirement already satisfied: atari_py>=0.1.4 in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (0.1.6)
+Requirement already satisfied: Pillow in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (5.3.0)
+Requirement already satisfied: PyOpenGL in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (3.1.0)
+Requirement already satisfied: box2d-py>=2.3.5 in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (2.3.5)
+Requirement already satisfied: mujoco_py>=1.50 in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (1.50.1.59)
+Requirement already satisfied: imageio in /opt/conda/lib/python3.6/site-packages (from gym==0.10.8) (2.4.1)
+Requirement already satisfied: chardet<3.1.0,>=3.0.2 in /opt/conda/lib/python3.6/site-packages (from requests>=2.0->gym==0.10.8) (3.0.4)
+Requirement already satisfied: idna<2.7,>=2.5 in /opt/conda/lib/python3.6/site-packages (from requests>=2.0->gym==0.10.8) (2.6)
+Requirement already satisfied: urllib3<1.23,>=1.21.1 in /opt/conda/lib/python3.6/site-packages (from requests>=2.0->gym==0.10.8) (1.22)
+Requirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.6/site-packages (from requests>=2.0->gym==0.10.8) (2018.4.16)
+Requirement already satisfied: future in /opt/conda/lib/python3.6/site-packages (from pyglet>=1.2.0->gym==0.10.8) (0.16.0)
+Requirement already satisfied: cffi>=1.10 in /opt/conda/lib/python3.6/site-packages (from mujoco_py>=1.50->gym==0.10.8) (1.11.5)
+Requirement already satisfied: glfw>=1.4.0 in /opt/conda/lib/python3.6/site-packages (from mujoco_py>=1.50->gym==0.10.8) (1.7.0)
+Requirement already satisfied: lockfile>=0.12.2 in /opt/conda/lib/python3.6/site-packages (from mujoco_py>=1.50->gym==0.10.8) (0.12.2)
+Requirement already satisfied: Cython>=0.27.2 in /opt/conda/lib/python3.6/site-packages (from mujoco_py>=1.50->gym==0.10.8) (0.28.5)
+Requirement already satisfied: pycparser in /opt/conda/lib/python3.6/site-packages (from cffi>=1.10->mujoco_py>=1.50->gym==0.10.8) (2.18)
+Installing collected packages: gym
+  Found existing installation: gym 0.10.8
+    Uninstalling gym-0.10.8:
+Could not install packages due to an EnvironmentError: [Errno 13] Permission denied: '/opt/conda/lib/python3.6/site-packages/gym.egg-link'
+Check the permissions.
+

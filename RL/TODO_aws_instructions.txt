@@ -1,0 +1,4 @@
+# for whatever reason gym and baselines commands in the dockerfile do not seem to be working
+@ /workspace
+pip install gym
+git clone https://github.com/openai/baselines.git && cd baselines && pip3 install -e .
