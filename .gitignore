@@ -6,3 +6,4 @@ videos/
 todo.txt
 *.hdf5
 *.gz
+RL/pytorch-a2c-ppo/
