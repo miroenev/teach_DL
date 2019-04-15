@@ -1,0 +1,12 @@
+create a sagemaker notebook instance
+
+launch a console [ click on 'new' -> terminal ]
+
+    $ chmod +x SageMaker/teach_DL/utils/install-k3d.sh
+
+    $ ./SageMaker/teach_DL/utils/install-k3d.sh
+
+launch jupyter notebook & run first cell
+ 
+    neural_net_training_and_visualization_mxnet.ipynb
+    
