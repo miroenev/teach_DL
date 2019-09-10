@@ -1,11 +1,12 @@
 
 # Training a commute prediction network, and visualizing learning!  
-<ul> latest version available from: https://github.com/miroenev/teach_DL , prerequisites:
-* Matplotlib, Numpy, Keras, and <a href="https://github.com/K3D-tools/K3D-jupyter">K3D</a> for realtime training 3D surface visualization
-* TensorFlow as the Keras backend for NN graph (queries model weights)
+In this notebook we'll visualize the learning/training process of a neural network on a toy problem.
 
-A video walkthrough of this notebook is <a href='https://youtu.be/HgbGJn9yz30'> available on YouTube</a>.
-</ul>
+Specifically we'll build a synthetic dataset, sample from it, and try to build a neural network model that predicts data unseen during training. The dataset is intended to capture the relationship between **commute-duration** (i.e., travel time to work, dependent variable) given **time-of-departure** and **weather-condition** (independent variables).
+
+Note that the latest version of this notebook is available from: [https://github.com/miroenev/teach_DL](https://github.com/miroenev/teach_DL). 
+
+Lastly, a video walkthrough of this notebook is <a href='https://youtu.be/HgbGJn9yz30'> available on YouTube</a>.
 
 # Define the problem
 
